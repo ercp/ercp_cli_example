@@ -1,6 +1,6 @@
 #![deny(unsafe_code)]
 
-use ercp_cli::{Cli, Opts};
+use ercp_cli_example::{Cli, Opts};
 use structopt::StructOpt;
 
 fn main() {
