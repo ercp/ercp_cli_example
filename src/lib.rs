@@ -30,11 +30,17 @@ pub enum Command {
     /// Tests communication with the device
     Ping,
 
-    /// Switches on the LED.
-    LedOn,
+    /// Commands the LED
+    Led {
+        #[structopt(subcommand)]
+        command: LedCommand,
+    },
 
-    /// Switches off the LED.
-    LedOff,
+    /// Commands the counter
+    Counter {
+        #[structopt(subcommand)]
+        command: CounterCommand,
+    },
 
     /// Gets the version of a component
     Version { component: Component },
@@ -44,6 +50,30 @@ pub enum Command {
 
     /// Waits for and prints logs sent by the device
     Log,
+}
+
+#[derive(Debug, StructOpt)]
+pub enum LedCommand {
+    /// Switches on the LED
+    On,
+
+    /// Switches off the LED
+    Off,
+}
+
+#[derive(Debug, StructOpt)]
+pub enum CounterCommand {
+    /// Gets the counter value
+    Get,
+
+    /// Sets the counter value
+    Set { value: u8 },
+
+    /// Increments the counter value
+    Inc,
+
+    /// Decrements the counter value
+    Dec,
 }
 
 pub struct CustomRouter {
@@ -60,8 +90,16 @@ impl Router for CustomRouter {
     fn route(&mut self, command: &Self::Command) {
         match command {
             Command::Ping => self.ping(),
-            Command::LedOn => self.led_on(),
-            Command::LedOff => self.led_off(),
+            Command::Led { command } => match command {
+                LedCommand::On => self.led_on(),
+                LedCommand::Off => self.led_off(),
+            },
+            Command::Counter { command } => match command {
+                CounterCommand::Get => self.counter_get(),
+                CounterCommand::Set { value } => self.counter_set(*value),
+                CounterCommand::Inc => self.counter_inc(),
+                CounterCommand::Dec => self.counter_dec(),
+            },
             Command::Version { component } => self.version(component),
             Command::Description => self.description(),
             Command::Log => self.log(),
@@ -83,6 +121,34 @@ impl CustomRouter {
 
     fn led_off(&mut self) {
         match self.device().led_off() {
+            Ok(()) => println!("Device: ACK"),
+            Err(_) => eprintln!("An error has occured"),
+        }
+    }
+
+    fn counter_get(&mut self) {
+        match self.device().counter_get() {
+            Ok(value) => println!("Counter: {}", value),
+            Err(_) => eprintln!("An error has occured"),
+        }
+    }
+
+    fn counter_set(&mut self, value: u8) {
+        match self.device().counter_set(value) {
+            Ok(()) => println!("Device: ACK"),
+            Err(_) => eprintln!("An error has occured"),
+        }
+    }
+
+    fn counter_inc(&mut self) {
+        match self.device().counter_inc() {
+            Ok(()) => println!("Device: ACK"),
+            Err(_) => eprintln!("An error has occured"),
+        }
+    }
+
+    fn counter_dec(&mut self) {
+        match self.device().counter_dec() {
             Ok(()) => println!("Device: ACK"),
             Err(_) => eprintln!("An error has occured"),
         }
