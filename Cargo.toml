@@ -1,0 +1,20 @@
+[package]
+name = "ercp_cli_example"
+version = "0.1.0"
+authors = ["Jean-Philippe Cugnet <jean-philippe@cugnet.eu>"]
+edition = "2018"
+
+[dependencies]
+structopt = "0.3.21"
+
+[dependencies.ercp_cli]
+git = "https://github.com/ercp/cli"
+branch = "develop"
+
+[dependencies.ercp_device]
+git = "https://github.com/ercp/cli"
+branch = "develop"
+
+[[bin]]
+name = "device"
+path = "src/main.rs"
